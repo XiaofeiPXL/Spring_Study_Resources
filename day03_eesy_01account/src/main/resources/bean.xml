@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans.xsd">
+    <!--配置beanFactory-->
+    <bean id="beanFactory" class="com.itheima.factory.beanFactory">
+        <property name="transactionManager" ref="transactionManager"/>
+        <property name="accountService" ref="accountService"/>
+    </bean>
+
+
+    <!--配置accountService的代理对象-->
+    <bean id="proxyAccountService" factory-bean="beanFactory" factory-method="getAccountService"/>
+
+
+    <!--配置Service-->
+    <bean id="accountService" class="com.itheima.service.impl.AccountServiceImpl">
+        <!--注入dao-->
+        <property name="accountDao" ref="accountDao"/>
+    </bean>
+
+    <!--配置dao对象-->
+    <bean id="accountDao" class="com.itheima.dao.impl.AccountDaoImpl">
+        <property name="runner" ref="runner"/>
+        <!--注入connection工具类bean-->
+        <property name="connectionUtils" ref="connectionUtils"/>
+    </bean>
+
+
+    <!--配置QueryRunner-->
+    <bean id="runner" class="org.apache.commons.dbutils.QueryRunner" scope="prototype"/>
+
+
+    <!--配置Connection的工具类-->
+    <bean id="connectionUtils" class="com.itheima.utils.ConnectionUtils">
+        <property name="dataSource" ref="dataSource"/>
+    </bean>
+
+    <!--配置事务管理工具类-->
+    <bean id="transactionManager" class="com.itheima.utils.TransactionManager">
+        <property name="connectionUtils" ref="connectionUtils"/>
+    </bean>
+
+    <bean id="dataSource" class="com.mchange.v2.c3p0.ComboPooledDataSource">
+        <property name="driverClass" value="com.mysql.cj.jdbc.Driver"/>
+        <property name="jdbcUrl"
+                  value="jdbc:mysql://localhost:3306/JDBCDemo?useUnicode=true&amp;characterEncoding=UTF-8&amp;serverTimezone=UTC"/>
+        <property name="user" value="root"/>
+        <property name="password" value="514524wxfpxl"/>
+    </bean>
+</beans>
